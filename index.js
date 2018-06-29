@@ -3,6 +3,7 @@ var Charset = Java.type('java.nio.charset.Charset')
 var router = {
     applicationDirectory: './',
     virtualRouteContext: '',
+    urlInterceptors: [],
 
     middlewares: [],
 
@@ -26,6 +27,10 @@ var router = {
 
     addRoute: function(virtualRoute, realRoute) {
         router.vroutes[router.virtualRouteContext + virtualRoute] = realRoute
+    },
+
+    addURLInterceptor: function (interceptor) {
+        router.urlInterceptors.push(interceptor);
     },
 
     addMiddleware: function(middleware) {
@@ -88,6 +93,10 @@ var router = {
         var keys = Object.keys(this.vroutes)
         var vrota
         var rrota
+
+        nurl = this.urlInterceptors.reduce(function (url, interceptor) {
+            return interceptor(url)
+        }, nurl)
 
         function runMethodOnModule(rrota) {
             var path = router.applicationDirectory
